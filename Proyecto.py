@@ -80,7 +80,7 @@ if archivo_registros_presencia is not None:
     provincia_registros = provincia_registros.join(cantones.set_index('cod_provin'), on='cod_provin', rsuffix='_b')
     # Dataframe filtrado para usar en graficación
     provincia_registros_grafico = provincia_registros.loc[provincia_registros['cantidad_registros_presencia1'] > 0, 
-                                                            ["provincia", "cantidad_registros_presencia1"]].sort_values("cantidad_registros_presencia1", ascending=[False]).head(100)
+                                                            ["provincia", "cantidad_registros_presencia1"]].sort_values("cantidad_registros_presencia1", ascending=[True])
     provincia_registros_grafico = provincia_registros_grafico.set_index('provincia') 
 
      # "Join" para agregar la columna con el conteo a la capa de canton
