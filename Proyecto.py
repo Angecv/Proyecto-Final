@@ -57,13 +57,13 @@ if archivo_registros_presencia is not None:
     # "Join" espacial de las capas de Provincias y registros de presencia
     provincia_contienen_registros = cantones.sjoin(registros_presencia, how="left", predicate="contains")
     # Conteo de registros de presencia en cada provincia
-    provincia_registros = provincia_contienen_registros.groupby("cod_provin").agg(cantidad_registros_presencia1 = ("gbifID","count"))
+    provincia_registros = provincia_contienen_registros.groupby("CODNUM").agg(cantidad_registros_presencia1 = ("gbifID","count"))
     provincia_registros = provincia_registros.reset_index() # para convertir la serie a dataframe
     # Cálculo de la cantidad de registros en Cantones
     # "Join" espacial de las capas de Cantones y registros de presencia
     cantones_contienen_registros = cantones.sjoin(registros_presencia, how="left", predicate="contains")
     # Conteo de registros de presencia en cada canton
-    cantones_registros = cantones_contienen_registros.groupby("cod_canton").agg(cantidad_registros_presencia = ("gbifID","count"))
+    cantones_registros = cantones_contienen_registros.groupby("CODNUM").agg(cantidad_registros_presencia = ("gbifID","count"))
     cantones_registros = cantones_registros.reset_index() # para convertir la serie a dataframe
 
    # SALIDAS
@@ -77,18 +77,18 @@ if archivo_registros_presencia is not None:
    
 # Gráficos de cantidad de registros de presencia por provincia
     # "Join" para agregar la columna con el conteo a la capa de provincia
-    provincia_registros = provincia_registros.join(cantones.set_index('cod_provin'), on='cod_provin', rsuffix='_b')
+    provincia_registros = provincia_registros.join(cantones.set_index('CODNUM'), on='CODNUM', rsuffix='_b')
     # Dataframe filtrado para usar en graficación
     provincia_registros_grafico = provincia_registros.loc[provincia_registros['cantidad_registros_presencia1'] > 0, 
-                                                            ["provincia", "cantidad_registros_presencia1"]].sort_values("cantidad_registros_presencia1", ascending=[True])
+                                                            ["provincia", "cantidad_registros_presencia1"]].sort_values("cantidad_registros_presencia1", ascending=[False])
     provincia_registros_grafico = provincia_registros_grafico.set_index('provincia') 
 
      # "Join" para agregar la columna con el conteo a la capa de canton
-    cantones_registros = cantones_registros.join(cantones.set_index('cod_canton'), on='cod_canton', rsuffix='_b')
+    cantones_registros = cantones_registros.join(cantones.set_index('CODNUM'), on='CODNUM', rsuffix='_b')
     # Dataframe filtrado para usar en graficación
     cantones_registros_grafico = cantones_registros.loc[cantones_registros['cantidad_registros_presencia'] > 0, 
-                                                            ["canton", "cantidad_registros_presencia"]].sort_values("cantidad_registros_presencia", ascending=[False]).head(15)
-    cantones_registros_grafico = cantones_registros_grafico.set_index('canton') 
+                                                            ["NCANTON", "cantidad_registros_presencia"]].sort_values("cantidad_registros_presencia", ascending=[False]).head(15)
+    cantones_registros_grafico = cantones_registros_grafico.set_index('NCANTON') 
 
 # Gráficos
     with col1:
@@ -101,7 +101,7 @@ if archivo_registros_presencia is not None:
     with col2:
         st.header('Cantidad de registros por Cantón')
         fig = px.bar(cantones_registros_grafico, 
-                    labels={'canton':'Cantón', 'cantidad_registros_presencia':'Registros de presencia'})
+                    labels={'NCANTON':'Cantón', 'cantidad_registros_presencia':'Registros de presencia'})
 
         st.plotly_chart(fig) 
 
@@ -146,9 +146,9 @@ if archivo_registros_presencia is not None:
         name="Cantidad de registros en Cantones",
         geo_data=cantones,
         data=cantones_registros,
-        columns=['cod_canton', 'cantidad_registros_presencia'],
+        columns=['CODNUM', 'cantidad_registros_presencia'],
         bins=8,
-        key_on='feature.properties.cod_canton',
+        key_on='feature.properties.CODNUM',
         fill_color='Reds', 
         fill_opacity=0.9, 
         line_opacity=1,
